@@ -19,7 +19,14 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         client.connect();
-        const collection = client.db("water").collection("product");
+        const productCollection = client.db("water").collection("product");
+
+        app.post('/additem', async (req, res) => {
+            const product = req.body;
+            const result = await productCollection.insertOne(product);
+            console.log(product);
+            res.send(result);
+        })
 
 
 
@@ -31,6 +38,7 @@ async function run() {
     }
 }
 
+run().catch(console.dir);
 
 
 
