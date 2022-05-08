@@ -21,7 +21,7 @@ async function run() {
     try {
         client.connect();
         const productCollection = client.db("water").collection("product");
-        const deliverCollection = client.db("water").collection("deliver");
+        const soldCollection = client.db("water").collection("deliver");
 
         // Post Items
         app.post('/additem', async (req, res) => {
@@ -79,6 +79,38 @@ async function run() {
             const result = await productCollection.updateOne(filter, updateQty, option);
             res.send(result);
         })
+        //Sold Item insert
+        app.post('/solditem/:id', async (req, res) => {
+
+            const items = req.body;
+            console.log(items)
+            const result = await soldCollection.insertOne(items);
+            res.send(result);
+        })
+
+        // --------------------------------------------------------
+        // get Sum of Sold Qty 
+        app.get('/soldqty/:id', async (req, res) => {
+            const id = req.params.id;
+            const item = { _id: ObjectId(id) };
+            const cursor = await soldCollection.aggregate([
+                {
+                    $group:
+                        { _id: "$itemId", TotalSum: { $sum: 1 } }
+                },
+                {
+                    $match: { _id: id }
+                }
+
+            ]
+            );
+            const restul = await cursor.toArray();
+            console.log(restul);
+            res.send(restul);
+        })
+
+        // --------------------------------------------------------
+
 
         //restock Item 
         app.put('/restockitem/:id', async (req, res) => {
@@ -87,14 +119,14 @@ async function run() {
             const restockQty = restockItem.qtyAfterRestock;
             console.log(restockQty);
             console.log(id);
-            const filter = { _id: ObjectId(id) };
+            const item = { _id: ObjectId(id) };
             const option = { upsert: true };
             const updateQty = {
                 $set: {
                     qty: restockQty
                 }
             }
-            const result = await productCollection.updateOne(filter, updateQty, option);
+            const result = await productCollection.updateOne(item, updateQty, option);
             res.send(result);
         })
 
