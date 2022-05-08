@@ -43,6 +43,14 @@ async function run() {
             const cursor = await productCollection.findOne(item);
             res.send(cursor);
         })
+        // Get Items by Email
+        app.get('/items', async (req, res) => {
+            const email = req.query.email;
+            const items = { email };
+            const cursor = productCollection.find(items);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
 
         //Delete Item 
         app.delete('/deleteitem/:id', async (req, res) => {
