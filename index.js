@@ -36,12 +36,19 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+        // Get single Items 
+        app.get('/item/:id', async (req, res) => {
+            const id = req.params.id;
+            const item = { _id: ObjectId(id) };
+            const cursor = await productCollection.findOne(item);
+            res.send(cursor);
+        })
 
         //Delete Item 
         app.delete('/deleteitem/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: ObjectId(id) };
-            const result = await productCollection.deleteOne(query);
+            const items = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(items);
             res.send(result);
         })
 
