@@ -21,6 +21,7 @@ async function run() {
     try {
         client.connect();
         const productCollection = client.db("water").collection("product");
+        const deliverCollection = client.db("water").collection("deliver");
 
         // Post Items
         app.post('/additem', async (req, res) => {
@@ -58,6 +59,42 @@ async function run() {
             const id = req.params.id;
             const items = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(items);
+            res.send(result);
+        })
+
+        //Deliver Item 
+        app.put('/deliveritem/:id', async (req, res) => {
+            const id = req.params.id;
+            const deliverItem = req.body;
+            const deliverQty = deliverItem.newQtydelivered;
+            console.log(deliverQty);
+            console.log(id);
+            const filter = { _id: ObjectId(id) };
+            const option = { upsert: true };
+            const updateQty = {
+                $set: {
+                    qty: deliverQty
+                }
+            }
+            const result = await productCollection.updateOne(filter, updateQty, option);
+            res.send(result);
+        })
+
+        //restock Item 
+        app.put('/restockitem/:id', async (req, res) => {
+            const id = req.params.id;
+            const restockItem = req.body;
+            const restockQty = restockItem.qtyAfterRestock;
+            console.log(restockQty);
+            console.log(id);
+            const filter = { _id: ObjectId(id) };
+            const option = { upsert: true };
+            const updateQty = {
+                $set: {
+                    qty: restockQty
+                }
+            }
+            const result = await productCollection.updateOne(filter, updateQty, option);
             res.send(result);
         })
 
