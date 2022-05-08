@@ -44,10 +44,11 @@ async function run() {
             res.send(cursor);
         })
         // Get Items by Email
-        app.get('/items', async (req, res) => {
+        app.get('/itemsbyemail', async (req, res) => {
+            console.log('query', req.query)
             const email = req.query.email;
-            const items = { email };
-            const cursor = productCollection.find(email);
+            const items = { email: (email) };
+            const cursor = productCollection.find(items);
             const result = await cursor.toArray();
             res.send(result);
         })
